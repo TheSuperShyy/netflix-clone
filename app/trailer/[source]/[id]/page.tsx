@@ -41,8 +41,8 @@ export default async function TrailerPage({
   }
 
   const imdbHref = title.imdbId
-    ? `https://www.imdb.com/title/${title.imdbId}/`
-    : `https://www.imdb.com/find/?q=${encodeURIComponent(title.title)}`;
+    ? `https://www.playimdb.com/title/${title.imdbId}/`
+    : `https://www.playimdb.com/find/?q=${encodeURIComponent(title.title)}`;
 
   const ratingDisplay = title.rating?.toFixed(1);
   const hasOurStream = (title.streams?.length ?? 0) > 0;
