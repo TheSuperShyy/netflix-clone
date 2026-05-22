@@ -65,7 +65,6 @@ export default function PlayerShell({ title }: { title: Title }) {
         title={title.title}
         src={{ src: current.url, type: srcType }}
         playsInline
-        crossOrigin
         className="w-full aspect-video bg-black"
       >
         <MediaProvider />
