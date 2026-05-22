@@ -39,9 +39,7 @@ export default function Hero({
 
   const title = titles[idx];
   const hasStreams = (title.streams?.length ?? 0) > 0;
-  const playHref = hasStreams
-    ? `/watch/${title.source}/${title.id}`
-    : title.justWatchUrl ?? '#';
+  const playHref = `/trailer/${title.source}/${title.id}?media=${title.mediaType ?? 'movie'}`;
   const ratingDisplay = title.rating?.toFixed(1);
 
   return (
@@ -113,8 +111,6 @@ export default function Hero({
         <div className="mt-6 flex items-center gap-3">
           <Link
             href={playHref}
-            target={hasStreams ? undefined : '_blank'}
-            rel={hasStreams ? undefined : 'noopener noreferrer'}
             className="inline-flex items-center gap-2 bg-brand-red hover:bg-red-700 transition-colors text-white font-semibold rounded-full px-7 py-3"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
