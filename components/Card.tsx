@@ -3,11 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
+import dynamic from 'next/dynamic';
 import type { Title } from '@/lib/types';
-import TrailerModal from './TrailerModal';
 
-export default function Card({ title }: { title: Title }) {
+const TrailerModal = dynamic(() => import('./TrailerModal'), { ssr: false });
+
+function CardImpl({ title }: { title: Title }) {
   const router = useRouter();
   const [trailerOpen, setTrailerOpen] = useState(false);
 
@@ -24,9 +26,12 @@ export default function Card({ title }: { title: Title }) {
   const isExternal = !hasStreams;
   const subtitle = title.year ?? title.source.toUpperCase();
 
-  const goToTrailerPage = () => router.push(trailerHref);
-
-  const stop = (e: React.MouseEvent | React.SyntheticEvent) => e.stopPropagation();
+  const goToTrailerPage = useCallback(() => router.push(trailerHref), [router, trailerHref]);
+  const closeTrailer = useCallback(() => setTrailerOpen(false), []);
+  const stop = useCallback(
+    (e: React.MouseEvent | React.SyntheticEvent) => e.stopPropagation(),
+    [],
+  );
 
   return (
     <>
@@ -94,7 +99,13 @@ export default function Card({ title }: { title: Title }) {
         </div>
       </div>
 
-      {trailerOpen && <TrailerModal title={title} onClose={() => setTrailerOpen(false)} />}
+      {trailerOpen && <TrailerModal title={title} onClose={closeTrailer} />}
     </>
   );
 }
+
+const Card = memo(CardImpl, (prev, next) =>
+  prev.title.source === next.title.source && prev.title.id === next.title.id,
+);
+
+export default Card;

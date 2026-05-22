@@ -20,10 +20,19 @@ export default function Row({ row, index = 0 }: { row: CatalogRow; index?: numbe
     updateEdges();
     const el = scrollerRef.current;
     if (!el) return;
-    el.addEventListener('scroll', updateEdges, { passive: true });
+    let rafId = 0;
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        updateEdges();
+      });
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', updateEdges);
     return () => {
-      el.removeEventListener('scroll', updateEdges);
+      if (rafId) window.cancelAnimationFrame(rafId);
+      el.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', updateEdges);
     };
   }, [updateEdges, row.titles.length]);
@@ -36,8 +45,11 @@ export default function Row({ row, index = 0 }: { row: CatalogRow; index?: numbe
 
   return (
     <section
-      className="mt-8 animate-fade-in-up"
-      style={{ animationDelay: `${Math.min(index * 80, 400)}ms` }}
+      className="mt-8 animate-fade-in-up cv-auto"
+      style={{
+        animationDelay: `${Math.min(index * 80, 400)}ms`,
+        containIntrinsicSize: '320px',
+      }}
     >
       <h2 className="text-lg md:text-xl font-bold mb-3 px-6 md:px-10 lg:px-14">
         {row.label}
@@ -56,7 +68,11 @@ export default function Row({ row, index = 0 }: { row: CatalogRow; index?: numbe
         <div
           ref={scrollerRef}
           className="row-scroll flex gap-3 md:gap-4 overflow-x-auto scroll-smooth pb-2 px-6 md:px-10 lg:px-14 snap-x snap-proximity"
-          style={{ scrollPaddingLeft: '1.5rem', scrollPaddingRight: '1.5rem' }}
+          style={{
+            scrollPaddingLeft: '1.5rem',
+            scrollPaddingRight: '1.5rem',
+            contain: 'layout style',
+          }}
         >
           {row.titles.map((title) => (
             <div key={`${title.source}:${title.id}`} className="snap-start">

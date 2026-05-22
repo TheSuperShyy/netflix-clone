@@ -24,16 +24,18 @@ export default function SearchPage() {
     }
     setLoading(true);
     setTouched(true);
-    const handle = setTimeout(() => {
-      const ctl = new AbortController();
+    const ctl = new AbortController();
+    const handle = window.setTimeout(() => {
       fetch(`/api/search?q=${encodeURIComponent(q.trim())}`, { signal: ctl.signal })
         .then((r) => r.json())
         .then((d: { results: Title[] }) => setResults(d.results ?? []))
         .catch(() => {})
         .finally(() => setLoading(false));
-      return () => ctl.abort();
-    }, 280);
-    return () => clearTimeout(handle);
+    }, 350);
+    return () => {
+      window.clearTimeout(handle);
+      ctl.abort();
+    };
   }, [q]);
 
   return (
@@ -79,12 +81,13 @@ export default function SearchPage() {
             <div className="text-zinc-500 text-sm">No results for "{q.trim()}".</div>
           )}
           {!loading && results.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 animate-fade-in">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {results.map((title) => (
-                <div key={`${title.source}:${title.id}`} className="w-full">
-                  <div className="flex justify-center">
-                    <Card title={title} />
-                  </div>
+                <div
+                  key={`${title.source}:${title.id}`}
+                  className="w-full flex justify-center"
+                >
+                  <Card title={title} />
                 </div>
               ))}
             </div>

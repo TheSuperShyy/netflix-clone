@@ -13,8 +13,7 @@ export default async function WatchPage({
   params: Promise<{ source: string; id: string }>;
   searchParams: Promise<{ media?: string }>;
 }) {
-  const { source, id } = await params;
-  const sp = await searchParams;
+  const [{ source, id }, sp] = await Promise.all([params, searchParams]);
   const mediaType: 'movie' | 'tv' = sp.media === 'tv' ? 'tv' : 'movie';
   const title = await resolveTitle(source, id, { mediaType });
   if (!title) notFound();
@@ -25,7 +24,7 @@ export default async function WatchPage({
     query: title.title,
     year: title.year,
     languages: 'en',
-  });
+  }).catch(() => []);
 
   const titleWithSubs = { ...title, subtitles };
 
